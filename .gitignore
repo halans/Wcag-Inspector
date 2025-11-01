@@ -6,3 +6,5 @@ backend/dist
 vite.config.ts.*
 *.tar.gz
 attached_assets
+frontend/.env.local
+backend/.wrangler/tmp/
