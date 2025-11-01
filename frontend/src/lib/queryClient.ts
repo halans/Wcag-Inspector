@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { withApiBase } from "@/lib/api-base";
 
 export class ApiError extends Error {
   constructor(
@@ -56,7 +57,7 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  const res = await fetch(withApiBase(url), {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -74,7 +75,7 @@ export const getQueryFn = <T>({
   on401: UnauthorizedBehavior;
 }): QueryFunction<T> =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    const res = await fetch(withApiBase(queryKey[0] as string), {
       credentials: "include",
     });
 

@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { AnalysisResponse } from "@shared/schema";
 import { ApiError } from "@/lib/queryClient";
+import { withApiBase } from "@/lib/api-base";
 
 export default function Home() {
   const [url, setUrl] = useState<string>("");
@@ -26,7 +27,7 @@ export default function Home() {
     queryFn: async () => {
       if (!url) return null;
       const response = await fetch(
-        `/api/analyze?url=${encodeURIComponent(url)}`,
+        withApiBase(`/api/analyze?url=${encodeURIComponent(url)}`),
       );
 
       if (!response.ok) {

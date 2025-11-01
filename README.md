@@ -93,6 +93,7 @@ This tool provides automated accessibility checking but cannot catch all possibl
    ```
 
 5. Open your browser and navigate to http://localhost:5173 (the default Vite dev server) while the worker runs on the port displayed by Wrangler.
+6. (Optional) If your API runs on a different origin during development, create `frontend/.env.local` and set `VITE_API_BASE_URL=https://your-worker.example.com` so the frontend targets that domain.
 
 ### Port Configuration
 
@@ -141,6 +142,8 @@ The backend lives in `backend/src/worker.ts` and ships as a module Worker.
 5. Back in Cloudflare Pages, create a route mapping `/api/*` to the worker so that frontend requests proxy automatically.
 
 With this setup, the React UI is served from Pages while the analysis API runs on the Worker edge runtime—no Node.js compatibility flags required.
+
+> 💡 If your Pages deployment serves the UI from a different host than the Worker, set `VITE_API_BASE_URL` during the frontend build (for example in the Pages project settings) to point at the Worker domain.
 
 ## Forking and Contributing
 
