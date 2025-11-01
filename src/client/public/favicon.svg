@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="100" fill="#3B82F6"/>
+  <circle cx="256" cy="256" r="150" fill="white"/>
+  <!-- Center dot -->
+  <circle cx="256" cy="276" r="20" fill="#3B82F6"/>
+  
+  <!-- Curved lines -->
+  <circle cx="256" cy="255" r="50" stroke="#3B82F6" stroke-width="20" fill="none"/>
+  <circle cx="256" cy="240" r="80" stroke="#3B82F6" stroke-width="20" fill="none"/>
+  <circle cx="256" cy="225" r="110" stroke="#3B82F6" stroke-width="20" fill="none"/>
+  
+  <!-- Diagonal lines -->
+  <line x1="310" y1="310" x2="350" y2="350" stroke="#3B82F6" stroke-width="25"/>
+  <line x1="202" y1="310" x2="162" y2="350" stroke="#3B82F6" stroke-width="25"/>
+</svg>

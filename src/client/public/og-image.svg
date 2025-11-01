@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#3B82F6"/>
+  <!-- White circle with accessibility icon -->
+  <circle cx="300" cy="315" r="120" fill="white"/>
+  <!-- Accessibility icon based on the provided image -->
+  <path d="M300 363C292 363 286 357 286 349C286 341 292 335 300 335C308 335 314 341 314 349C314 357 308 363 300 363Z" fill="#3B82F6"/>
+  <path d="M339 307L323 323C317 317 309 313 300 313C291 313 283 317 277 323L261 307C270 298 284 292 300 292C316 292 330 298 339 307Z" fill="#3B82F6"/>
+  <path d="M363 283L347 299C333 285 317 277 300 277C283 277 267 285 253 299L237 283C255 265 276 254 300 254C324 254 345 265 363 283Z" fill="#3B82F6"/>
+  <path d="M342 342L358 358C358 358 358 358 358 358C358 364 354 370 349 372L333 356C338 354 341 348 342 342Z" fill="#3B82F6"/>
+  <path d="M258 342C259 348 262 354 267 356L251 372C246 370 242 364 242 358C242 358 242 358 242 358L258 342Z" fill="#3B82F6"/>
+  
+  <!-- Text -->
+  <text x="480" y="330" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white">WCAG Inspector</text>
+  <text x="480" y="400" font-family="Arial, sans-serif" font-size="36" fill="white">Website Accessibility Analysis Tool</text>
+</svg>
