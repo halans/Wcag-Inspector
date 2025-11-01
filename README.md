@@ -138,7 +138,7 @@ The backend lives in `backend/src/worker.ts` and ships as a module Worker.
    npm run build:backend            # Produces backend/dist/worker.js for inspection
    wrangler deploy --config backend/wrangler.toml
    ```
-4. Ensure the `ANALYSIS_FETCH_TIMEOUT_MS` variable is configured either in `backend/wrangler.toml` or via `wrangler secret put`.
+4. Ensure the `ANALYSIS_FETCH_TIMEOUT_MS` variable is configured either in `backend/wrangler.toml` or via `wrangler secret put`. If your frontend lives on a different domain, set `CORS_ALLOWED_ORIGIN=https://your-frontend.example.com` (comma-separated for multiples) so cross-origin requests succeed.
 5. Back in Cloudflare Pages, create a route mapping `/api/*` to the worker so that frontend requests proxy automatically.
 
 With this setup, the React UI is served from Pages while the analysis API runs on the Worker edge runtime—no Node.js compatibility flags required.

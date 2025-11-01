@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import type { ExecutionContext } from "@cloudflare/workers-types";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import {
@@ -10,6 +11,7 @@ import {
 
 type Bindings = {
   ANALYSIS_FETCH_TIMEOUT_MS?: string;
+  CORS_ALLOWED_ORIGIN?: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -22,9 +24,39 @@ function parseTimeout(env: Bindings): number | undefined {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+function parseAllowedOrigins(env: Bindings): "*" | string[] {
+  const raw = env.CORS_ALLOWED_ORIGIN?.trim();
+  if (!raw) {
+    return "*";
+  }
+  const origins = raw
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+  return origins.length === 0 ? "*" : origins;
+}
+
 app.onError((err, c) => {
   const { status, body } = toErrorResponse(err);
   return c.json(body, status as ContentfulStatusCode);
+});
+
+app.use("*", (c, next) => {
+  const allowed = parseAllowedOrigins(c.env);
+  return cors({
+    origin: (origin) => {
+      if (allowed === "*") {
+        return "*";
+      }
+      if (!origin) {
+        return allowed[0] ?? "";
+      }
+      return allowed.includes(origin) ? origin : "";
+    },
+    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["GET", "POST", "OPTIONS"],
+    maxAge: 86400,
+  })(c, next);
 });
 
 app.post("/api/analyze", async (c) => {
