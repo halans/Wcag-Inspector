@@ -105,13 +105,50 @@ PORT=3000 npm run dev
 ### Deploying on Cloud Platforms
 
 1. Fork this repository on GitHub
-2. Connect your GitHub account to your preferred hosting platform (Vercel, Netlify, Railway, Heroku, etc.)
+2. Connect your GitHub account to your preferred hosting platform (Cloudflare, Vercel, Netlify, Railway, Heroku, etc.)
 3. Import the repository and configure build settings:
    - Build Command: `npm run build`
    - Start Command: `npm run start`
    - Node.js version: 16 or higher
 4. Set environment variables if needed (e.g., `PORT` for custom port)
 5. Deploy and your app will be live
+
+### Deploying on Cloudflare
+
+#### Cloudflare Pages (Frontend)
+Cloudflare Pages can host the static client bundle and serve it from Cloudflare’s global CDN.
+
+1. In the Cloudflare dashboard, create a new Pages project and select this repository.
+2. Use the following build configuration:
+   - **Build command:** `npm run build`
+   - **Output directory:** `dist/public`
+   - **Node version:** `20` (or 18+) for faster builds.
+3. Define any environment variables needed by the client at build time (optional).
+4. Trigger a deploy — Pages will install dependencies, run the build, and publish the static assets.
+
+> **Note:** The client expects to call `/api/*` on the same origin. When hosting the API separately (see below), set up a Pages Function or Cloudflare Worker route to proxy `/api` requests to your API runtime.
+
+#### Cloudflare Workers (Express API)
+The Express server can be deployed to Cloudflare Workers using the Node.js compatibility layer.
+
+1. Install the Cloudflare CLI: `npm install -g wrangler`.
+2. Build the project locally: `npm run build` (outputs `dist/index.js`).
+3. Create a `wrangler.toml` file alongside `package.json`:
+   ```toml
+   name = "wcag-inspector-api"
+   main = "dist/index.js"
+   compatibility_date = "2024-04-15"
+   compatibility_flags = ["nodejs_compat"]
+   ```
+4. Provide environment variables in `wrangler.toml` or via `wrangler secret put`, e.g.:
+   ```toml
+   [vars]
+   ANALYSIS_FETCH_TIMEOUT_MS = "10000"
+   ```
+5. Publish the worker: `wrangler deploy`.
+6. In Cloudflare Pages, create a route rule mapping `/api/*` to the worker so client calls are forwarded automatically.
+
+Both services can be managed from a single Cloudflare account, giving you a globally distributed frontend with a serverless API that respects the project’s timeout and error-handling guarantees.
 
 ## Forking and Contributing
 
