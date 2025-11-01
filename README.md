@@ -26,7 +26,7 @@ A comprehensive web accessibility analysis tool that evaluates websites against 
 ## Tech Stack
 
 - Frontend: React with TypeScript, TailwindCSS, shadcn/ui components
-- Backend: Node.js with Express
+- Backend: Cloudflare Worker with Hono
 - HTML Analysis: Cheerio for DOM parsing and analysis
 - Form Validation: Zod and React Hook Form
 - Data Fetching: TanStack Query
@@ -83,14 +83,16 @@ This tool provides automated accessibility checking but cannot catch all possibl
    ```
    Edit `.env` if you want to customize the port or other settings.
 
-4. Start the development server:
+4. Start the development servers:
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   # Frontend (Vite)
+   npm run dev:frontend
+
+   # Backend worker (optional, requires Wrangler login)
+   npm run dev:backend
    ```
 
-5. Open your browser and navigate to http://localhost:5000 (or the port shown in the terminal if 5000 is unavailable)
+5. Open your browser and navigate to http://localhost:5173 (the default Vite dev server) while the worker runs on the port displayed by Wrangler.
 
 ### Port Configuration
 
@@ -104,14 +106,11 @@ PORT=3000 npm run dev
 
 ### Deploying on Cloud Platforms
 
-1. Fork this repository on GitHub
-2. Connect your GitHub account to your preferred hosting platform (Cloudflare, Vercel, Netlify, Railway, Heroku, etc.)
-3. Import the repository and configure build settings:
-   - Build Command: `npm run build`
-   - Start Command: `npm run start`
-   - Node.js version: 16 or higher
-4. Set environment variables if needed (e.g., `PORT` for custom port)
-5. Deploy and your app will be live
+1. Fork this repository on GitHub.
+2. Connect your account to the hosting platform(s) you plan to use.
+3. Build the frontend bundle locally with `npm run build:frontend` (or let your CI execute the command).
+4. Deploy the frontend output from `frontend/dist` to your static host of choice.
+5. Deploy the backend worker using the instructions below or via `npm run deploy:backend` (a convenience script you can wire up to Wrangler).
 
 ### Deploying on Cloudflare
 
@@ -120,35 +119,28 @@ Cloudflare Pages can host the static client bundle and serve it from Cloudflare�
 
 1. In the Cloudflare dashboard, create a new Pages project and select this repository.
 2. Use the following build configuration:
-   - **Build command:** `npm run build`
-   - **Output directory:** `dist/public`
+   - **Build command:** `npm run build:frontend`
+   - **Output directory:** `frontend/dist`
    - **Node version:** `20` (or 18+) for faster builds.
 3. Define any environment variables needed by the client at build time (optional).
 4. Trigger a deploy — Pages will install dependencies, run the build, and publish the static assets.
 
-> **Note:** The client expects to call `/api/*` on the same origin. When hosting the API separately (see below), set up a Pages Function or Cloudflare Worker route to proxy `/api` requests to your API runtime.
+> **Note:** The client expects to call `/api/*` on the same origin. Use a Pages Function or a Worker route (below) to proxy those requests to your backend Worker.
 
-#### Cloudflare Workers (Express API)
-The Express server can be deployed to Cloudflare Workers using the Node.js compatibility layer.
+#### Cloudflare Workers (API)
+The backend lives in `backend/src/worker.ts` and ships as a module Worker.
 
-1. Install the Cloudflare CLI: `npm install -g wrangler`.
-2. Build the project locally: `npm run build` (outputs `dist/index.js`).
-3. Create a `wrangler.toml` file alongside `package.json`:
-   ```toml
-   name = "wcag-inspector-api"
-   main = "dist/index.js"
-   compatibility_date = "2024-04-15"
-   compatibility_flags = ["nodejs_compat"]
+1. Install the Cloudflare CLI: `npm install -g wrangler` (or use the local dev dependency).
+2. Authenticate with `wrangler login` if you haven’t already.
+3. Deploy the worker (the default `wrangler.toml` enables `nodejs_compat` so Cheerio can run in the Worker runtime):
+   ```bash
+   npm run build:backend            # Produces backend/dist/worker.js for inspection
+   wrangler deploy --config backend/wrangler.toml
    ```
-4. Provide environment variables in `wrangler.toml` or via `wrangler secret put`, e.g.:
-   ```toml
-   [vars]
-   ANALYSIS_FETCH_TIMEOUT_MS = "10000"
-   ```
-5. Publish the worker: `wrangler deploy`.
-6. In Cloudflare Pages, create a route rule mapping `/api/*` to the worker so client calls are forwarded automatically.
+4. Ensure the `ANALYSIS_FETCH_TIMEOUT_MS` variable is configured either in `backend/wrangler.toml` or via `wrangler secret put`.
+5. Back in Cloudflare Pages, create a route mapping `/api/*` to the worker so that frontend requests proxy automatically.
 
-Both services can be managed from a single Cloudflare account, giving you a globally distributed frontend with a serverless API that respects the project’s timeout and error-handling guarantees.
+With this setup, the React UI is served from Pages while the analysis API runs on the Worker edge runtime—no Node.js compatibility flags required.
 
 ## Forking and Contributing
 
@@ -173,9 +165,9 @@ Both services can be managed from a single Cloudflare account, giving you a glob
 
 To add new criteria to the analyzer, edit the following files:
 
-1. src/server/accessibility.ts - Add a new analysis function and update the wcagCriteria array
-2. src/shared/schema.ts - Update schemas if necessary
-3. src/client/src/lib/wcag-criteria.ts - Add the new criteria to the frontend list
+1. packages/shared/src/analysis/accessibility.ts - Add a new analysis function and update the wcagCriteria array
+2. packages/shared/src/schema.ts - Update schemas if necessary
+3. frontend/src/lib/wcag-criteria.ts - Add the new criteria to the frontend list
 
 ### Changing the UI Theme
 

@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { mergeConfig, defineConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 
@@ -8,7 +8,7 @@ export default mergeConfig(
     test: {
       environment: "jsdom",
       globals: true,
-      setupFiles: path.resolve(__dirname, "src/test/setup.ts"),
+      setupFiles: path.resolve(__dirname, "frontend/test/setup.ts"),
       css: true,
     },
   }),

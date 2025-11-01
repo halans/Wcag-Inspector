@@ -1,5 +1,11 @@
 {
-  "include": ["src/client/src/**/*", "src/shared/**/*", "src/server/**/*"],
+  "include": [
+    "frontend/src/**/*",
+    "frontend/test/**/*",
+    "packages/shared/src/**/*",
+    "packages/shared/test/**/*",
+    "backend/src/**/*"
+  ],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts", "**/*.test.tsx"],
   "compilerOptions": {
     "incremental": true,
@@ -14,10 +20,11 @@
     "allowImportingTsExtensions": true,
     "moduleResolution": "bundler",
     "baseUrl": ".",
-    "types": ["node", "vite/client"],
+    "types": ["node", "vite/client", "@cloudflare/workers-types"],
     "paths": {
-      "@/*": ["./src/client/src/*"],
-      "@shared/*": ["./src/shared/*"]
+      "@/*": ["./frontend/src/*"],
+      "@shared": ["./packages/shared/src/index"],
+      "@shared/*": ["./packages/shared/src/*"]
     }
   }
 }

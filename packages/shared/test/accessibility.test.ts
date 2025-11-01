@@ -1,25 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { analyzeWebsite } from "./accessibility";
-import { HttpError } from "./errors";
-import { FetchError } from "node-fetch";
+import { analyzeWebsite } from "../analysis/accessibility";
+import { HttpError } from "../analysis/errors";
 
 const fetchMock = vi.fn();
-
-vi.mock("node-fetch", () => {
-  const fetchFn = (...args: unknown[]) => fetchMock(...args);
-
-  class MockFetchError extends Error {
-    constructor(message: string, public readonly type?: string) {
-      super(message);
-      this.name = "FetchError";
-    }
-  }
-
-  return {
-    default: fetchFn,
-    FetchError: MockFetchError,
-  };
-});
 
 describe("analyzeWebsite error handling", () => {
   beforeEach(() => {
@@ -28,24 +11,24 @@ describe("analyzeWebsite error handling", () => {
 
   afterEach(() => {
     vi.useRealTimers();
-    delete process.env.ANALYSIS_FETCH_TIMEOUT_MS;
   });
 
   it("aborts requests that exceed the timeout", async () => {
-    process.env.ANALYSIS_FETCH_TIMEOUT_MS = "50";
     vi.useFakeTimers();
 
     fetchMock.mockImplementation((_: unknown, options: { signal?: AbortSignal }) => {
       return new Promise((_resolve, reject) => {
         options?.signal?.addEventListener("abort", () => {
-          const abortError = new Error("Request aborted");
-          abortError.name = "AbortError";
+          const abortError = new DOMException("Request aborted", "AbortError");
           reject(abortError);
         });
       });
     });
 
-    const analysisPromise = analyzeWebsite("https://example.com");
+    const analysisPromise = analyzeWebsite("https://example.com", {
+      timeoutMs: 50,
+      fetchImpl: fetchMock as unknown as typeof fetch,
+    });
 
     await vi.advanceTimersByTimeAsync(50);
 
@@ -56,9 +39,13 @@ describe("analyzeWebsite error handling", () => {
   });
 
   it("maps upstream failures to FETCH_FAILURE", async () => {
-    fetchMock.mockRejectedValue(new FetchError("network error", "system"));
+    fetchMock.mockRejectedValue(new TypeError("network error"));
 
-    await expect(analyzeWebsite("https://example.com"))
+    await expect(
+      analyzeWebsite("https://example.com", {
+        fetchImpl: fetchMock as unknown as typeof fetch,
+      }),
+    )
       .rejects.toMatchObject<HttpError>({
         code: "FETCH_FAILURE",
         status: 502,

@@ -23,11 +23,11 @@ WCAG Inspector is a comprehensive web accessibility analysis tool that evaluates
 - **Lucide React** for iconography
 
 ### Backend
-- **Node.js** with Express.js for REST API server
+- **Cloudflare Worker** (module format) using Hono for routing
 - **TypeScript** for type safety across the entire stack
 - **Cheerio** for server-side HTML parsing and DOM analysis
 - **Zod** for runtime type validation and schema definition
-- **Node Fetch** for HTTP requests and website fetching
+- **Fetch API** (edge runtime) for HTTP requests and website fetching
 
 ### Data Storage
 - **In-memory storage** for current implementation (no persistent database)
@@ -35,9 +35,9 @@ WCAG Inspector is a comprehensive web accessibility analysis tool that evaluates
 - **Storage abstraction layer** to easily switch between memory and database storage
 
 ### Build & Development
-- **Vite** for fast development and optimized production builds
-- **ESBuild** for server-side bundling
-- **TSX** for TypeScript execution in development
+- **Vite** for fast frontend development and optimized production builds under `frontend/`
+- **Esbuild** for bundling the Worker entry in `backend/`
+- **Wrangler** for local Worker development and deployment
 - **PostCSS** and **Autoprefixer** for CSS processing
 
 ### Export & Utilities
@@ -66,14 +66,17 @@ WCAG Inspector is a comprehensive web accessibility analysis tool that evaluates
 
 ### File Organization
 ```
-├── src/
-│   ├── client/
-│   │   ├── src/        # React application code
-│   │   └── index.html  # Vite entry template
-│   ├── server/         # Express server and API logic
-│   ├── shared/         # Shared types and schemas
-│   └── public/         # Static assets served by Vite
-└── openspec/           # Project documentation and specs
+├── frontend/
+│   ├── src/           # React application code
+│   ├── public/        # Static assets
+│   └── vite.config.ts # Frontend build configuration
+├── backend/
+│   ├── src/worker.ts  # Cloudflare Worker entry point
+│   └── wrangler.toml  # Worker deployment configuration
+├── packages/
+│   └── shared/
+│       └── src/       # Shared schemas, errors, and analysis logic
+└── openspec/          # Project documentation and specs
 ```
 
 ### Testing Strategy

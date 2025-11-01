@@ -1,11 +1,10 @@
-import fetch, { FetchError } from "node-fetch";
 import * as cheerio from "cheerio";
 import {
   AnalysisResponse,
   AnalysisUrlValidationError,
   CriterionResult,
   normalizeAnalysisUrl,
-} from "@shared/schema";
+} from "../schema";
 import {
   fetchFailureError,
   fetchTimeoutError,
@@ -132,6 +131,11 @@ const wcagCriteria = [
 // Helper functions
 const DEFAULT_FETCH_TIMEOUT_MS = 10_000;
 
+export interface AnalyzeWebsiteOptions {
+  timeoutMs?: number;
+  fetchImpl?: typeof fetch;
+}
+
 function normalizeUrl(url: string): string {
   try {
     return normalizeAnalysisUrl(url);
@@ -143,18 +147,11 @@ function normalizeUrl(url: string): string {
   }
 }
 
-function resolveFetchTimeout(): number {
-  const raw = process.env.ANALYSIS_FETCH_TIMEOUT_MS;
-  if (!raw) {
-    return DEFAULT_FETCH_TIMEOUT_MS;
+function resolveFetchTimeout(timeoutMs?: number): number {
+  if (typeof timeoutMs === "number" && Number.isFinite(timeoutMs) && timeoutMs > 0) {
+    return timeoutMs;
   }
-
-  const parsed = Number.parseInt(raw, 10);
-  if (Number.isNaN(parsed) || parsed <= 0) {
-    return DEFAULT_FETCH_TIMEOUT_MS;
-  }
-
-  return parsed;
+  return DEFAULT_FETCH_TIMEOUT_MS;
 }
 
 function isAbortError(error: unknown): boolean {
@@ -1130,16 +1127,20 @@ function analyzeAccessibleAuthenticationNoException($: cheerio.CheerioAPI): Crit
   };
 }
 
-export async function analyzeWebsite(url: string): Promise<AnalysisResponse> {
+export async function analyzeWebsite(
+  url: string,
+  options: AnalyzeWebsiteOptions = {},
+): Promise<AnalysisResponse> {
   try {
     const normalizedUrl = normalizeUrl(url);
-    const timeoutMs = resolveFetchTimeout();
+    const timeoutMs = resolveFetchTimeout(options.timeoutMs);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    let response;
+    const fetchImpl = options.fetchImpl ?? fetch;
+    let response: Response;
     try {
-      response = await fetch(normalizedUrl, {
+      response = await fetchImpl(normalizedUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (compatible; WCAGAnalyzer/1.0)",
         },
@@ -1149,7 +1150,7 @@ export async function analyzeWebsite(url: string): Promise<AnalysisResponse> {
       if (isAbortError(error)) {
         throw fetchTimeoutError(timeoutMs, { cause: error });
       }
-      if (error instanceof FetchError) {
+      if (error instanceof Error) {
         throw fetchFailureError({ cause: error });
       }
       throw error;

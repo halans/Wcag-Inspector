@@ -1,7 +1,8 @@
 node_modules
 dist
+frontend/dist
+backend/dist
 .DS_Store
-server/public
 vite.config.ts.*
 *.tar.gz
 attached_assets
