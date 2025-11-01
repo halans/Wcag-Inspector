@@ -1,0 +1,7 @@
+name = "wcag-inspector-api"
+main = "dist/index.js"
+compatibility_date = "2024-04-15"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ANALYSIS_FETCH_TIMEOUT_MS = "10000"
