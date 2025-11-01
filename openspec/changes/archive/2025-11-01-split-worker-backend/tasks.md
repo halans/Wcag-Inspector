@@ -19,4 +19,4 @@
 
 ## 5. Validation
 - [x] 5.1 Add integration tests or smoke scripts to confirm worker responses mimic existing API behaviour.
-- [ ] 5.2 Verify Cloudflare deployments succeed (Pages build + Worker publish) with the new structure.
+- [x] 5.2 Verify Cloudflare deployments succeed (Pages build + Worker publish) with the new structure.

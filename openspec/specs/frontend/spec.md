@@ -1,5 +1,8 @@
-## MODIFIED Requirements
+# frontend Specification
 
+## Purpose
+TBD - created by archiving change split-worker-backend. Update Purpose after archive.
+## Requirements
 ### Requirement: Maintain React Frontend Build
 The existing Vite-based React UI MUST continue to build and deploy independently under a `frontend/` root directory.
 
@@ -16,3 +19,4 @@ Project documentation MUST reflect the new `frontend/` directory and associated 
 - **GIVEN** a developer reads the README setup instructions
 - **WHEN** they look for client code references
 - **THEN** paths reference `frontend/` (e.g., `frontend/src/…`) instead of the previous `src/client/…` layout.
+
