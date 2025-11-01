@@ -1,5 +1,5 @@
 import type { Express, Response } from "express";
-import { createServer, type Server } from "http";
+import { createServer, type Server } from "node:http";
 import {
   AnalysisUrlValidationError,
   analysisUrlErrorMessages,
