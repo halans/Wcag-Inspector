@@ -1,8 +1,15 @@
 const rawBase = (import.meta.env.VITE_API_BASE_URL ?? "").trim();
-const sanitizedBase =
+const normalizedBase =
   rawBase.length === 0
     ? ""
-    : rawBase.replace(/\/+$/, "");
+    : /^https?:\/\//i.test(rawBase)
+        ? rawBase
+        : `https://${rawBase}`;
+
+const sanitizedBase =
+  normalizedBase.length === 0
+    ? ""
+    : normalizedBase.replace(/\/+$/, "");
 
 export function withApiBase(path: string): string {
   if (!sanitizedBase) {

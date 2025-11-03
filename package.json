@@ -11,7 +11,9 @@
     "build:frontend": "vite build --config frontend/vite.config.ts",
     "build:backend": "esbuild backend/src/worker.ts --bundle --format=esm --platform=neutral --target=es2022 --outdir=backend/dist --tsconfig=tsconfig.json --external:node:* --external:whatwg-mimetype --external:whatwg-encoding --external:iconv-lite --external:string_decoder --external:css-what",
     "check": "tsc",
-    "test": "vitest run",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "vitest run --coverage",
+    "test:backend": "vitest run --config backend/vitest.config.ts --coverage backend/test",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
@@ -76,15 +78,16 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241112.0",
     "@tailwindcss/typography": "^0.5.15",
     "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.5.2",
-    "@cloudflare/workers-types": "^4.20241112.0",
     "@types/node": "20.16.11",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.2",
+    "@vitest/coverage-v8": "^1.6.1",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.30.4",
     "esbuild": "^0.25.0",

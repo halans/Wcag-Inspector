@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CriterionResult } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import CriterionCard from "./CriterionCard";
+import CriterionCard, { anchorIdForCriterion } from "./CriterionCard";
 import { CheckCircle2, AlertCircle, ListFilter, Info, Eye, HandIcon, BrainCircuit, AccessibilityIcon } from "lucide-react";
 
 interface CriteriaTabsProps {
@@ -45,10 +45,10 @@ export default function CriteriaTabs({ criteria }: CriteriaTabsProps) {
       <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <ListFilter className="mr-2 h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">WCAG 2.2 Success Criteria</h2>
+          <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">Filter WCAG 2.2 Criteria</h2>
         </div>
         <p className="text-gray-600 dark:text-gray-400 text-sm">
-          View details on individual success criteria and filter by status.
+          Narrow the list of criteria by status or POUR principle.
         </p>
       </CardHeader>
 
@@ -178,7 +178,11 @@ export default function CriteriaTabs({ criteria }: CriteriaTabsProps) {
               </div>
             ) : (
               getFilteredCriteria().map(criterion => (
-                <CriterionCard key={criterion.criterionId} criterion={criterion} />
+                <CriterionCard
+                  key={criterion.criterionId}
+                  criterion={criterion}
+                  anchorId={`${anchorIdForCriterion(criterion.criterionId)}-filter`}
+                />
               ))
             )}
           </TabsContent>

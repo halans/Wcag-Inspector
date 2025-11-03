@@ -93,7 +93,12 @@ This tool provides automated accessibility checking but cannot catch all possibl
    ```
 
 5. Open your browser and navigate to http://localhost:5173 (the default Vite dev server) while the worker runs on the port displayed by Wrangler.
-6. (Optional) If your API runs on a different origin during development, create `frontend/.env.local` and set `VITE_API_BASE_URL=https://your-worker.example.com` so the frontend targets that domain.
+6. (Optional) If your API runs on a different origin during development, create `frontend/.env.local` and set:
+   ```ini
+   VITE_API_BASE_URL=https://your-worker.example.com
+   VITE_DEV_API_PROXY=http://127.0.0.1:8787 # Wrangler default
+   ```
+   The dev proxy lets Vite forward `/api/*` calls to your worker, while `VITE_API_BASE_URL` controls the base URL used in production builds.
 
 ### Port Configuration
 
@@ -144,6 +149,17 @@ The backend lives in `backend/src/worker.ts` and ships as a module Worker.
 With this setup, the React UI is served from Pages while the analysis API runs on the Worker edge runtime—no Node.js compatibility flags required.
 
 > 💡 If your Pages deployment serves the UI from a different host than the Worker, set `VITE_API_BASE_URL` during the frontend build (for example in the Pages project settings) to point at the Worker domain.
+
+## Testing & Coverage
+
+- Run the full test suite (frontend + backend with coverage):
+  ```bash
+  npm run test
+  ```
+- Frontend-only tests with coverage: `npm run test:frontend`
+- Backend worker tests with coverage: `npm run test:backend`
+
+Coverage reports are generated in text and LCOV formats; CI should fail if coverage drops below the configured thresholds.
 
 ## Forking and Contributing
 

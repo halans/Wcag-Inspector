@@ -8,25 +8,44 @@ import { Separator } from "@/components/ui/separator";
 
 interface CriterionCardProps {
   criterion: CriterionResult;
+  isExpanded?: boolean;
+  onToggle?: (shouldExpand: boolean) => void;
+  anchorId?: string;
 }
 
-export default function CriterionCard({ criterion }: CriterionCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const toggleExpanded = () => setIsExpanded(!isExpanded);
-  
+export const anchorIdForCriterion = (criterionId: string) =>
+  `criterion-${criterionId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
+export default function CriterionCard({
+  criterion,
+  isExpanded,
+  onToggle,
+  anchorId,
+}: CriterionCardProps) {
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const expanded = isExpanded ?? internalExpanded;
+
+  const toggleExpanded = () => {
+    const next = !expanded;
+    onToggle?.(next);
+    if (isExpanded === undefined) {
+      setInternalExpanded(next);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       toggleExpanded();
     }
   };
-  
+
   return (
     <Card 
+      id={anchorId ?? anchorIdForCriterion(criterion.criterionId)}
       tabIndex={0}
       role="button"
-      aria-expanded={isExpanded}
+      aria-expanded={expanded}
       onKeyDown={handleKeyDown}
       onClick={toggleExpanded}
       className={`overflow-hidden border-l-4 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4 ${
@@ -35,7 +54,7 @@ export default function CriterionCard({ criterion }: CriterionCardProps) {
           : "border-l-red-500 hover:shadow-md hover:shadow-red-100 dark:hover:shadow-none"
       }`}>
       <CardHeader className={`p-5 flex flex-row items-center justify-between ${
-        isExpanded 
+        expanded 
           ? "bg-gray-50 dark:bg-gray-900/50" 
           : "bg-white dark:bg-gray-800"
       }`}>
@@ -98,17 +117,20 @@ export default function CriterionCard({ criterion }: CriterionCardProps) {
         <Button 
           variant="ghost" 
           size="sm"
-          onClick={toggleExpanded}
+          onClick={(event) => {
+            event.stopPropagation();
+            toggleExpanded();
+          }}
           onKeyDown={handleKeyDown}
-          aria-expanded={isExpanded}
-          aria-label={`${isExpanded ? "Hide" : "Show"} details for ${criterion.name} criterion`}
+          aria-expanded={expanded}
+          aria-label={`${expanded ? "Hide" : "Show"} details for ${criterion.name} criterion`}
           className={`rounded-full p-2 ${
-            isExpanded
+            expanded
               ? "bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
               : "text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-700/50"
           } focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500`}
         >
-          {isExpanded ? (
+          {expanded ? (
             <ChevronUp className="h-5 w-5" aria-hidden="true" />
           ) : (
             <ChevronDown className="h-5 w-5" aria-hidden="true" />
@@ -116,7 +138,7 @@ export default function CriterionCard({ criterion }: CriterionCardProps) {
         </Button>
       </CardHeader>
       
-      {isExpanded && (
+      {expanded && (
         <>
           <Separator className="h-px bg-gray-200 dark:bg-gray-700" />
           <CardContent className="p-5 space-y-6 bg-white dark:bg-gray-800">

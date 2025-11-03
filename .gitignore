@@ -8,3 +8,5 @@ vite.config.ts.*
 attached_assets
 frontend/.env.local
 backend/.wrangler/tmp/
+coverage/*
+frontend/coverage/*

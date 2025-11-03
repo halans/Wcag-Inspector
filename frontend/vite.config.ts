@@ -10,6 +10,15 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: process.env.VITE_DEV_API_PROXY ?? "http://localhost:8787",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
